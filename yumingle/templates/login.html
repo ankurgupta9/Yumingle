@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+        {% load static %}
+        <link rel="shortcut icon" type="image/png" href="{% static 'my_images/logo.png' %}"/>
+    <title>YuMingle</title>
+</head>
+
+<body>
+    <div class="container my-5 p-2">
+        <div class="row justify-content-center">
+            <a class="text-center mb-3" href="/">
+                {% load static %}
+                <img src="{% static 'my_images/logo.png' %}" width="100" height="55">
+            </a>
+            <div class="col-md-6">
+                <div class="card rounded rounded-5 shadow border border-success border-3">
+                    <div align="center" class="card-header bg-white m-2 h2"><svg xmlns="http://www.w3.org/2000/svg"
+                            width="40" height="40" fill="currentColor"
+                            class="bi bi-person rounded- rounded-circle p-1 border border-2 border-dark"
+                            viewBox="0 0 16 16">
+                            <path
+                                d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z" />
+                        </svg> Login to your account</div>
+                        <form method="post" id="loginform">
+                            {% csrf_token %}
+                    <div class="card-body">
+                        <!-- <h6 class="text-center text-muted">Login to your account</h6> -->
+                            <div class="form-group p-2">
+                                <label for="username">Username:</label>
+                                <input type="text" class="form-control" id="username" name="username" required autocomplete="off">
+                            </div>
+                            <div class="form-group p-2">
+                                <label for="password">Password:</label>
+                                <input type="password" class="form-control" id="password" name="password" required autocomplete="off">
+                            </div>
+                            {% if messages %}
+                                <ul class="messages text-light btn-danger rounded text-center p-2 mt-3">
+                                    {% for message in messages %}
+                                    <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+                                        {% endfor %}
+                                </ul>
+                                {% endif %}
+                            <div align="center" class="mt-3">
+                                <button type="submit" value="login" name="login"
+                                    class="btn btn-primary px-5">Continue</button>
+                            </div>
+                        <div align="center" class="form-text mt-2">Don't have an account? <a
+                                href="register"><b>Register</b><a></div>
+                    </div>
+                 </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

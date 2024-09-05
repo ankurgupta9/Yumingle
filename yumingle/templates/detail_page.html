@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    {% load static %}
+    <link rel="shortcut icon" type="image/png" href="{% static 'my_images/logo.png' %}" />
+    <title>YuMingle</title>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                {% load static %}
+                <img src="{% static 'my_images/logo.png' %}" width="50" height="35">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" aria-current="page" href="/#browse">Browse</a>
+                    </li>
+                    {% if request.user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Welcome, {{request.user.username}}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink">
+                            <li><a class="dropdown-item" href="/add">Upload recipe</a></li>
+                            <li><a class="dropdown-item" href="/view">My recipes</a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                </ul>
+                <div class="d-flex justify-content-center">
+                    <form class="d-flex">
+                        <input name="search" id="search" class="form-control rounded bg-light rounded-end rounded-pill"
+                            type="text" placeholder="Search by recipe name" size="60">
+                        <button class="btn btn-outline-success rounded rounded-start rounded-pill"
+                            type="submit">⌕</button>
+                    </form>
+                </div>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        {% if request.user.is_authenticated %}
+                        <a class="btn btn-outline-light border rounded rounded-pill" href="/logout">sign out</a>
+                        {% else %}
+                        <a class="btn btn-outline-light border rounded rounded-pill" href="/login">sign in</a>
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <div class="card border border-0 my-3 mt-sm-5 mb-5 p-sm-4">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <div class="sticky-top">
+                        <div class="bg-light rounded-3 p-2">
+                            <img src="/media/{{ recipe.recipe_image }}" class="img-fluid rounded-3"
+                                style="width: 100%; height: 300px; object-fit:contain;" draggable="false" /><hr>
+                            <div class="d-inline-flex mt-3">
+                                <div class="mx-1 p-1 rounded rounded-3 col-xl-8">
+                                    <h6 class="text-center">Total Ingredient(s)</h6>
+                                    <h5 class="text-center">{{ ingredients|length }}</h5>
+                                </div>
+                                <div class="mx-1 p-1 rounded rounded-3 col-xl-8">
+                                    <h6 class="text-center">Preparation Time</h6>
+                                    <h5 class="text-center">{{recipe.recipe_time}} minutes</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body mx-sm-5 my-1">
+                        <small class="text-muted">Posted by {{recipe.User}} on {{recipe.date}}</small>
+                        <div class="d-flex">
+                        <h4 class="card-title mb-4">{{recipe.recipe_name}}</h4>
+                        {% if recipe.recipe_variety == "veg" %}
+                        {% load static %}
+                        <img src="{% static 'my_images/veg.png' %}" title="Veg" class="mx-1" width="25" height="25">
+                        {% else %}
+                        <img src="{% static 'my_images/non-veg.png' %}" title="non-Veg" class="mx-1" width="25" height="25">
+                        {% endif %}
+                        </div>
+                        <p class="card-text">{{recipe.recipe_description}}</p>
+                    </div>
+                    <div class="card-body mx-sm-5 my-1">
+                        <ul class="list-group list-group-numbered list-group-flush">
+                            Ingredient:
+                            {% for all_ingredients in ingredients %}
+                            <li class="list-group-item">{{all_ingredients.name}}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="card-body mx-sm-5 my-1">
+                        Directions:
+                        <p class="card-text" style="white-space: pre-line;">{{recipe.recipe_direction}}</p>
+                    </div>
+                    <div class="card-body mx-sm-5 mt-1">
+                        <form method="POST" action="{% url 'add_review' recipe.id %}" class="d-flex flex-column">
+                            {% csrf_token %}
+                            {% if request.user.is_authenticated %}
+                            <textarea class="form-control m-1" id="review_text" name="review_text" placeholder="Write your review" required></textarea>
+                            <!-- <input type="number" class="form-control mx-1" name="rating" placeholder="Rate Recipe (1.0 - 5.0)" step="0.1" min="1.0" max="5.0" required> -->
+                            <div class="row rounded-3 m-1">
+                            <label class="col-xl-2 text-muted">Add Rating: </label>
+                            <div class="form-check col-xl-1 mx-2 bg-light rounded-3">
+                                <input class="form-check-input" type="radio" name="rating" id="poor" value="1.0">
+                                <label class="form-check-label" title="poor" for="poor">🤢</label>
+                            </div>
+                            <div class="form-check col-xl-1 mx-2 bg-light rounded-3">
+                                <input class="form-check-input" type="radio" name="rating" id="average" value="2.0">
+                                <label class="form-check-label" title="average" for="average">😐</label>
+                            </div>
+                            <div class="form-check col-xl-1 mx-2 bg-light rounded-3">
+                                <input class="form-check-input" type="radio" name="rating" id="good" value="3.0">
+                                <label class="form-check-label" title="good" for="good">😊</label>
+                            </div>
+                            <div class="form-check col-xl-1 mx-2 bg-light rounded-3">
+                                <input class="form-check-input" type="radio" name="rating" id="very_good" value="4.0">
+                                <label class="form-check-label" title="very good" for="very_good">🤤</label>
+                            </div>
+                            <div class="form-check col-xl-1 mx-2 bg-light rounded-3">
+                                <input class="form-check-input" type="radio" name="rating" id="excellent" value="5.0">
+                                <label class="form-check-label" title="excellent" for="excellent">😍</label>
+                            </div>
+                            </div>
+                            <div align="right"><button type="submit" class="btn btn-outline-success btn-sm rounded-pill mt-2">Submit</button></div>
+                            {% else %}
+                            <p class="text-muted">Please login to leave a review.</p>
+                            {% endif %}
+                        </form>
+                </div>
+                    <div class="card-body mx-sm-5 mb-1">
+                        <h6 class="mt-1">User reviews:</h6>
+                        <h4 class="bg-light border p-1 rounded-3 m-1 p-2">Average rating:
+                            {% for avg_rating in average_ratings %}
+                            {% if avg_rating.0 == recipe.id %}
+                                {% if avg_rating.1 %} 
+                                   ({{ avg_rating.1 }})
+                                    {% if avg_rating.1 >= 5 %}
+                                    😍
+                                    {% elif avg_rating.1 >= 4 %}
+                                    🤤
+                                    {% elif avg_rating.1 >= 3 %}
+                                    😊 
+                                    {% elif avg_rating.1 >= 2 %}
+                                    😐
+                                    {% else %}
+                                    🤢
+                                    {% endif %}
+                                {% else %}
+                                <h1>yo</h1>
+                                {% endif %}
+                            {% endif %}
+                            {% endfor %}
+                        </h4>
+                        <ul class="list-group">
+                            {% for review in reviews %}
+                            <div class="bg-light border p-1 rounded-3 m-1">
+                                <small>{{ review.User }} <small class="text-muted">(reviewed on: {{ review.date }})</small></small>
+                                <h6 class="p-1 fw-normal">
+                                {% if review.rating == 1.0 %}
+                                🤢
+                                {% elif review.rating == 2.0 %}
+                                😐
+                                {% elif review.rating == 3.0 %}
+                                😊
+                                {% elif review.rating == 4.0 %}
+                                🤤
+                                {% elif review.rating == 5.0 %}
+                                😍
+                                {% else %}
+                                
+                                {% endif %} {{ review.text }}
+                                </h6>
+                            </div>
+                            {% empty %}
+                            <li class="list-group-item border-0 text-center">No reviews yet.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-light text-center p-2">
+        <h5>YuMingle</h5>
+        <h6>explore - create - share</h6>
+    </footer>
+
+</body>
+
+</html>
